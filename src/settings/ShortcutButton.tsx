@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { showToast } from "../stores/toastStore";
-import { acceleratorFromEvent, formatShortcut, normalizeAccelerator, reservedShortcutAction } from "../lib/shortcutLabel";
+import { acceleratorFromEvent, formatShortcut, shortcutOwner } from "../lib/shortcutLabel";
 
 interface ShortcutButtonProps {
   value: string;
   defaultValue: string;
   onChange: (accelerator: string) => void;
-  /** Other user shortcuts this one must not take, with the action each belongs to. */
+  /** Every other shortcut in use (`shortcutsInUse`), with the action each belongs to. */
   others?: Record<string, string>;
 }
 
@@ -28,9 +28,7 @@ export function ShortcutButton({ value, defaultValue, onChange, others = {} }: S
       }
       const accel = acceleratorFromEvent(e);
       if (!accel) return;
-      const taken =
-        reservedShortcutAction(accel) ??
-        Object.entries(others).find(([other]) => normalizeAccelerator(other) === normalizeAccelerator(accel))?.[1];
+      const taken = shortcutOwner(accel, others);
       if (taken) {
         // Keep listening: the current binding (and the other action) stay as they are.
         showToast(`${formatShortcut(accel)} is already used by "${taken}"`, "error");

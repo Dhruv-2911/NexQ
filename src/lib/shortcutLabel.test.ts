@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { acceleratorFromEvent, formatShortcut, normalizeAccelerator, reservedShortcutAction } from "./shortcutLabel";
+import { acceleratorFromEvent, formatShortcut, normalizeAccelerator, shortcutOwner } from "./shortcutLabel";
 
 const press = (over: Partial<KeyboardEvent>) =>
   ({ key: "h", code: "KeyH", ctrlKey: false, metaKey: false, shiftKey: false, altKey: false, ...over }) as KeyboardEvent;
@@ -34,14 +34,16 @@ describe("acceleratorFromEvent", () => {
   });
 });
 
-describe("reserved shortcuts", () => {
+describe("shortcutOwner", () => {
+  const inUse = { "CmdOrCtrl+M": "Start / End Meeting", "CmdOrCtrl+B": "Show / Hide Overlay" };
+
   it("matches equivalent spellings on each platform", () => {
     expect(normalizeAccelerator("shift+ctrl+h", false)).toBe("CmdOrCtrl+Shift+H");
-    expect(reservedShortcutAction("Ctrl+M", false)).toBe("Start / end meeting");
-    expect(reservedShortcutAction("CommandOrControl+B", true)).toBe("Show / hide overlay");
-    expect(reservedShortcutAction("Cmd+M", true)).toBe("Start / end meeting");
+    expect(shortcutOwner("Ctrl+M", inUse, false)).toBe("Start / End Meeting");
+    expect(shortcutOwner("CommandOrControl+B", inUse, true)).toBe("Show / Hide Overlay");
+    expect(shortcutOwner("Cmd+M", inUse, true)).toBe("Start / End Meeting");
     // Control+M on a Mac is not Command+M.
-    expect(reservedShortcutAction("Ctrl+M", true)).toBeNull();
-    expect(reservedShortcutAction("CmdOrCtrl+Shift+H", false)).toBeNull();
+    expect(shortcutOwner("Ctrl+M", inUse, true)).toBeNull();
+    expect(shortcutOwner("CmdOrCtrl+Shift+H", inUse, false)).toBeNull();
   });
 });

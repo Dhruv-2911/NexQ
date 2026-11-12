@@ -146,3 +146,20 @@ it("without AI assistance, Space and the number keys run nothing and no Assist s
     features.ai = true;
   }
 });
+
+it("a shortcut changed in Settings › Hotkeys takes over at once and frees the old key", async () => {
+  await mountWindow("launcher");
+  const { useConfigStore, DEFAULT_HOTKEYS } = await import("../stores/configStore");
+  await waitFor(() => expect(shortcuts.has("CmdOrCtrl+M")).toBe(true));
+
+  act(() => useConfigStore.setState({
+    hotkeys: { ...DEFAULT_HOTKEYS, start_end_meeting: "CmdOrCtrl+Shift+M", open_settings: "CmdOrCtrl+Shift+O" },
+  }));
+
+  await waitFor(() => expect(shortcuts.has("CmdOrCtrl+Shift+M")).toBe(true));
+  await waitFor(() => expect(shortcuts.has("CmdOrCtrl+Shift+O")).toBe(true));
+  expect(shortcuts.has("CmdOrCtrl+M")).toBe(false);
+  expect(shortcuts.has("CmdOrCtrl+,")).toBe(false);
+  // The key that didn't change stays registered.
+  expect(shortcuts.has("CmdOrCtrl+B")).toBe(true);
+});

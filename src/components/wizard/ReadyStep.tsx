@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useConfigStore } from "../../stores/configStore";
 import { FEATURES } from "../../lib/features";
+import { formatShortcut } from "../../lib/shortcutLabel";
 
 interface ReadyStepProps {
   onStartMeeting: () => void;
@@ -20,16 +21,16 @@ interface ReadyStepProps {
 function useShortcuts() {
   const hotkeys = useConfigStore((s) => s.hotkeys);
   const all = [
-    { keys: hotkeys.toggle_assist, action: "Trigger AI Assist", context: "During meeting", ai: true },
-    { keys: hotkeys.start_end_meeting, action: "Start / End meeting", context: "Global" },
-    { keys: hotkeys.show_hide, action: "Show / Hide overlay", context: "Global" },
-    { keys: hotkeys.mode_say, action: "What to Say mode", context: "During meeting", ai: true },
-    { keys: hotkeys.mode_shorten, action: "Shorten mode", context: "During meeting", ai: true },
-    { keys: hotkeys.mode_followup, action: "Follow-up mode", context: "During meeting", ai: true },
-    { keys: hotkeys.mode_recap, action: "Recap mode", context: "During meeting", ai: true },
-    { keys: hotkeys.mode_ask, action: "Ask Question mode", context: "During meeting", ai: true },
-    { keys: hotkeys.open_settings, action: "Open Settings", context: "Global" },
-    { keys: hotkeys.escape, action: "Close overlay / settings", context: "Global" },
+    { keys: "Space", action: "Trigger AI Assist", context: "During meeting", ai: true },
+    { keys: formatShortcut(hotkeys.start_end_meeting), action: "Start / End meeting", context: "Global" },
+    { keys: formatShortcut(hotkeys.show_hide), action: "Show / Hide overlay", context: "Global" },
+    { keys: "1", action: "What to Say mode", context: "During meeting", ai: true },
+    { keys: "2", action: "Shorten mode", context: "During meeting", ai: true },
+    { keys: "3", action: "Follow-up mode", context: "During meeting", ai: true },
+    { keys: "4", action: "Recap mode", context: "During meeting", ai: true },
+    { keys: "5", action: "Ask Question mode", context: "During meeting", ai: true },
+    { keys: formatShortcut(hotkeys.open_settings), action: "Open Settings", context: "Global" },
+    { keys: "Esc", action: "Close overlay / settings", context: "Global" },
   ];
   return all.filter((s) => FEATURES.ai || !("ai" in s && s.ai));
 }

@@ -14,6 +14,7 @@ import { TokenBudget } from "../context/TokenBudget";
 import { TestSearchDialog } from "../context/TestSearchDialog";
 import { APP_VERSION, APP_DEVELOPER } from "../lib/version";
 import { FEATURES } from "../lib/features";
+import { formatShortcut } from "../lib/shortcutLabel";
 import { ServiceStatusBar } from "../components/ServiceStatusBar";
 import { showMeetingOverlay } from "../lib/windows";
 import { endMeetingFromThisWindow } from "../hooks/useUpdater";
@@ -95,6 +96,7 @@ export function LauncherView() {
 
   const contextStrategy = useConfigStore((s) => s.contextStrategy);
   const rememberedMeetingSetup = useConfigStore((s) => s.rememberedMeetingSetup);
+  const meetingShortcut = useConfigStore((s) => s.hotkeys.start_end_meeting);
   const indexStatus = useRagStore((s) => s.indexStatus);
   const isIndexing = useRagStore((s) => s.isIndexing);
   const indexStale = useRagStore((s) => s.indexStale);
@@ -394,7 +396,7 @@ export function LauncherView() {
                   <div className="text-meta font-normal text-white/50">
                     {rememberedMeetingSetup
                       ? `${rememberedMeetingSetup.audioMode === "online" ? "Online" : "In-Person"}${FEATURES.ai ? ` · ${rememberedMeetingSetup.scenario.replace("_", " ")}` : ""}`
-                      : "Ctrl+M"
+                      : formatShortcut(meetingShortcut)
                     }
                   </div>
                 </div>

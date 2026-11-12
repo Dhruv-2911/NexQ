@@ -63,7 +63,9 @@ iA-ASR can translate the transcript, live or after the meeting.
 
 ## Hotkeys
 
-Lists the main shortcuts: **Start / End Meeting**, **Show / Hide Overlay**, **Open Settings** and **Escape / Cancel**. In this build, changing a binding here doesn't change the key iA-ASR responds to. See [Keyboard Shortcuts](keyboard-shortcuts.md) for the keys that work.
+Change the global shortcuts: **Start / End Meeting**, **Show / Hide Overlay**, **Open Settings** and **Hide from screen share**. Click a shortcut, then press the new combination (it needs Ctrl, Alt or the Windows key; Cmd, Option or Control on macOS). Escape cancels. A combination another action already uses is refused. The new key works at once, and **Reset to Defaults** puts all of them back.
+
+Below them, **During a meeting** lists the in-meeting keys, which can't be changed. See [Keyboard Shortcuts](keyboard-shortcuts.md).
 
 ## General
 

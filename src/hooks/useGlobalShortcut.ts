@@ -12,7 +12,8 @@ import { isOverlayVisible, meetingShortcutAction, showLauncherWindow, showMeetin
 import { endMeetingFromThisWindow } from "./useUpdater";
 import { showToast } from "../stores/toastStore";
 import { useConfigStore } from "../stores/configStore";
-import { normalizeAccelerator, reservedShortcutAction } from "../lib/shortcutLabel";
+import { shortcutOwner } from "../lib/shortcutLabel";
+import { shortcutsInUse } from "../lib/appShortcuts";
 import { FEATURES } from "../lib/features";
 
 /** Ctrl+M: end the running meeting (in every window that holds it) or start one. */
@@ -48,6 +49,9 @@ export async function toggleStealthMode(): Promise<void> {
 export function useGlobalShortcut() {
   const stealthShortcut = useConfigStore((s) => s.stealthShortcut);
   const assistShortcut = useConfigStore((s) => s.assistShortcut);
+  const meetingKey = useConfigStore((s) => s.hotkeys.start_end_meeting);
+  const overlayKey = useConfigStore((s) => s.hotkeys.show_hide);
+  const settingsKey = useConfigStore((s) => s.hotkeys.open_settings);
   const meetingActive = useMeetingStore((s) => !!s.activeMeeting);
 
   // Assist from any app (Space only works while the overlay has focus). Held
@@ -56,7 +60,7 @@ export function useGlobalShortcut() {
   useEffect(() => {
     const key = assistShortcut;
     if (!FEATURES.ai || !meetingActive || !key || getCurrentWebviewWindow().label !== "overlay") return;
-    if (reservedShortcutAction(key) || normalizeAccelerator(key) === normalizeAccelerator(stealthShortcut)) {
+    if (shortcutOwner(key, shortcutsInUse(useConfigStore.getState(), "assist"))) {
       console.warn(`[useGlobalShortcut] Assist shortcut ${key} collides with another shortcut; not registered`);
       return;
     }
@@ -82,14 +86,15 @@ export function useGlobalShortcut() {
       cancelled = true;
       if (registered) unregister(key).catch(() => {});
     };
-  }, [assistShortcut, stealthShortcut, meetingActive]);
+  }, [assistShortcut, stealthShortcut, meetingActive, meetingKey, overlayKey, settingsKey]);
 
   // Stealth mode shortcut (user-configurable, re-registered when it changes)
   useEffect(() => {
     const key = stealthShortcut;
-    // Never take over a built-in shortcut (e.g. a binding saved before it was
-    // reserved): registering it would unregister that action's handler.
-    if (!key || reservedShortcutAction(key)) {
+    // Never take over another action's shortcut: registering it would
+    // unregister that action's handler. (Assist gives way to stealth.)
+    const config = useConfigStore.getState();
+    if (!key || shortcutOwner(key, shortcutsInUse({ ...config, assistShortcut: "" }, "stealth"))) {
       if (key) console.warn(`[useGlobalShortcut] Stealth shortcut ${key} collides with a built-in shortcut; not registered`);
       return;
     }
@@ -108,19 +113,23 @@ export function useGlobalShortcut() {
     return () => {
       if (registered) unregister(key).catch(() => {});
     };
-  }, [stealthShortcut]);
+  }, [stealthShortcut, meetingKey, overlayKey, settingsKey]);
 
-  // Global shortcuts (work even when window is not focused)
+  // Global shortcuts (work even when window is not focused). The keys come
+  // from Settings › Hotkeys and are registered again when they change.
   useEffect(() => {
-    const shortcuts: string[] = [];
+    const registered: string[] = [];
+    let cancelled = false;
 
     async function registerShortcuts() {
       const isLauncher = getCurrentWebviewWindow().label === "launcher";
       // Register each shortcut independently — one failure shouldn't block the rest.
       // Unregister first to handle hot-reload / React strict mode re-mounts.
-      const defs: Array<{ key: string; handler: (event: { state: string }) => void }> = [
+      const defs: Array<{ key: string; launcherOnly?: boolean; handler: (event: { state: string }) => void }> = [
         {
-          key: "CmdOrCtrl+M",
+          // One window starts and ends meetings, so a press never does both.
+          key: meetingKey,
+          launcherOnly: true,
           handler: (event) => {
             if (event.state === "Pressed") {
               toggleMeetingFromShortcut().catch(() => {});
@@ -128,7 +137,7 @@ export function useGlobalShortcut() {
           },
         },
         {
-          key: "CmdOrCtrl+B",
+          key: overlayKey,
           handler: (event) => {
             if (event.state === "Pressed") {
               (async () => {
@@ -140,7 +149,7 @@ export function useGlobalShortcut() {
           },
         },
         {
-          key: "CmdOrCtrl+,",
+          key: settingsKey,
           handler: (event) => {
             if (event.state === "Pressed") {
               const store = useMeetingStore.getState();
@@ -150,12 +159,18 @@ export function useGlobalShortcut() {
         },
       ];
 
-      for (const { key, handler } of defs) {
-        if (key === "CmdOrCtrl+M" && !isLauncher) continue;
+      for (const { key, launcherOnly, handler } of defs) {
+        if (!key || (launcherOnly && !isLauncher)) continue;
         try {
           await unregister(key).catch(() => {}); // Clean up stale registration
+          if (cancelled) return;
           await register(key, handler);
-          shortcuts.push(key);
+          // The keys changed (or the window unmounted) while registering.
+          if (cancelled) {
+            unregister(key).catch(() => {});
+            return;
+          }
+          registered.push(key);
         } catch (err) {
           console.warn(`Failed to register shortcut ${key}:`, err);
         }
@@ -165,11 +180,12 @@ export function useGlobalShortcut() {
     registerShortcuts();
 
     return () => {
-      shortcuts.forEach((s) => {
-        unregister(s).catch(() => {});
+      cancelled = true;
+      registered.forEach((key) => {
+        unregister(key).catch(() => {});
       });
     };
-  }, []);
+  }, [meetingKey, overlayKey, settingsKey]);
 
   // Window-level shortcuts (work when window is active/focused): Space and
   // 1-5 run AI actions, so they exist only with AI assistance.

@@ -4,14 +4,14 @@ On macOS, use `Cmd` wherever this page says `Ctrl` for the global shortcuts and 
 
 ## Global shortcuts
 
-These work from any app, even when iA-ASR isn't focused.
+These work from any app, even when iA-ASR isn't focused. The keys below are the defaults; change any of them in **Settings > Hotkeys**.
 
 | Shortcut | Action |
 |---|---|
 | `Ctrl+M` | Start a meeting, or end the running one. Starting this way skips the setup dialog and uses the audio mode you used last. |
 | `Ctrl+B` | Show or hide the overlay. During a meeting it switches between the overlay and the dashboard; with no meeting running it brings the dashboard back. |
 | `Ctrl+,` | Open or close Settings. |
-| `Ctrl+Shift+H` | Turn **Hide from screen share** on or off. Change this shortcut in **Settings > General**. |
+| `Ctrl+Shift+H` | Turn **Hide from screen share** on or off. |
 
 ## During a meeting
 
@@ -44,7 +44,7 @@ If the meeting was recorded, these control the player when no text field is focu
 |---|---|
 | `Esc` | Close Settings. |
 
-**Settings > Hotkeys** lists the main shortcuts, but in this build changing a binding there doesn't change the key iA-ASR responds to. The **Hide from screen share** shortcut is the one you can change, in **Settings > General**.
+**Settings > Hotkeys** changes the global shortcuts. The new key works at once. The **Hide from screen share** shortcut can also be changed in **Settings > General**.
 
 ## System tray
 

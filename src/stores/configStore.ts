@@ -82,11 +82,16 @@ function pushClaudeCliConfig(config: ClaudeCliConfig): void {
   );
 }
 
-const DEFAULT_HOTKEYS: HotkeyConfig = {
+/**
+ * Start/end meeting, show/hide overlay and open settings are global shortcuts
+ * (Tauri accelerators) the user can change; the rest are the fixed in-window
+ * keys, listed for display.
+ */
+export const DEFAULT_HOTKEYS: HotkeyConfig = {
   toggle_assist: "Space",
-  start_end_meeting: "Ctrl+M",
-  show_hide: "Ctrl+B",
-  open_settings: "Ctrl+,",
+  start_end_meeting: "CmdOrCtrl+M",
+  show_hide: "CmdOrCtrl+B",
+  open_settings: "CmdOrCtrl+,",
   escape: "Escape",
   mode_assist: "Space",
   mode_say: "1",
@@ -1155,7 +1160,7 @@ export const useConfigStore = create<ConfigState>((set) => ({
         ...(startOnLogin != null && { startOnLogin }),
         ...(dataDirectory != null && { dataDirectory }),
         ...(firstRunCompleted != null && { firstRunCompleted }),
-        ...(hotkeys != null && { hotkeys }),
+        ...(hotkeys != null && { hotkeys: { ...DEFAULT_HOTKEYS, ...hotkeys } }),
         ...(activeWhisperModel !== undefined && { activeWhisperModel }),
         ...(activeModelPerEngine != null && { activeModelPerEngine }),
         ...(whisperDualPass != null && { whisperDualPass }),
@@ -1278,6 +1283,9 @@ export const useConfigStore = create<ConfigState>((set) => ({
       });
       store.onKeyChange<boolean>("stealthMode", (val) => {
         if (val != null) set({ stealthMode: val });
+      });
+      store.onKeyChange<HotkeyConfig>("hotkeys", (val) => {
+        if (val != null) set({ hotkeys: { ...DEFAULT_HOTKEYS, ...val } });
       });
       store.onKeyChange<string>("stealthShortcut", (val) => {
         if (val != null) set({ stealthShortcut: val });

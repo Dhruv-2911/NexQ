@@ -92,23 +92,15 @@ export function normalizeAccelerator(accelerator: string, mac = isMacPlatform())
   return [...MODIFIER_ORDER.filter((m) => mods.has(m)), key].join("+");
 }
 
-/**
- * Shortcuts iA-ASR already uses (global: Ctrl+M, Ctrl+B, Ctrl+,; in-window:
- * Ctrl+Shift+L dev log, Ctrl+Shift+D demo). A user binding must not take one.
- */
-export const RESERVED_SHORTCUTS: Record<string, string> = {
-  "CmdOrCtrl+M": "Start / end meeting",
-  "CmdOrCtrl+B": "Show / hide overlay",
-  "CmdOrCtrl+,": "Open settings",
-  "CmdOrCtrl+Shift+L": "Dev log",
-  "CmdOrCtrl+Shift+D": "Demo mode",
-};
-
-/** The action that already owns `accelerator`, if any. */
-export function reservedShortcutAction(accelerator: string, mac = isMacPlatform()): string | null {
+/** The action in `inUse` (accelerator → action) that already owns `accelerator`, if any. */
+export function shortcutOwner(
+  accelerator: string,
+  inUse: Record<string, string>,
+  mac = isMacPlatform(),
+): string | null {
   const wanted = normalizeAccelerator(accelerator, mac);
-  for (const [accel, action] of Object.entries(RESERVED_SHORTCUTS)) {
-    if (normalizeAccelerator(accel, mac) === wanted) return action;
+  for (const [accel, action] of Object.entries(inUse)) {
+    if (accel && normalizeAccelerator(accel, mac) === wanted) return action;
   }
   return null;
 }

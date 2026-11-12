@@ -6,6 +6,7 @@ import { getStealthSupport } from "../lib/ipc";
 import { ShortcutButton } from "./ShortcutButton";
 import type { StealthSupport } from "../lib/types";
 import { FEATURES } from "../lib/features";
+import { shortcutsInUse } from "../lib/appShortcuts";
 
 /**
  * Settings → General: stealth mode ("Hide from screen share"), its shortcut,
@@ -18,8 +19,15 @@ export function StealthSettings() {
   const setShortcut = useConfigStore((s) => s.setStealthShortcut);
   const assistShortcut = useConfigStore((s) => s.assistShortcut);
   const setAssistShortcut = useConfigStore((s) => s.setAssistShortcut);
-  const stealthTaken = useMemo(() => ({ [assistShortcut]: "Assist" }), [assistShortcut]);
-  const assistTaken = useMemo(() => ({ [shortcut]: "Hide from screen share" }), [shortcut]);
+  const hotkeys = useConfigStore((s) => s.hotkeys);
+  const stealthTaken = useMemo(
+    () => shortcutsInUse({ hotkeys, stealthShortcut: shortcut, assistShortcut }, "stealth"),
+    [hotkeys, shortcut, assistShortcut],
+  );
+  const assistTaken = useMemo(
+    () => shortcutsInUse({ hotkeys, stealthShortcut: shortcut, assistShortcut }, "assist"),
+    [hotkeys, shortcut, assistShortcut],
+  );
 
   const [support, setSupport] = useState<StealthSupport | null>(null);
   const [busy, setBusy] = useState(false);
