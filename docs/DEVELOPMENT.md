@@ -63,7 +63,7 @@ npm run package:portable
 That runs `npx tauri build`, then `scripts/package-portable.mjs`, and gives you two things to share:
 
 - **Installer:** `src-tauri\target\release\bundle\nsis\iA-ASR_<version>_x64-setup.exe`. It installs WebView2 and the Visual C++ runtime if they're missing, and adds Start-menu and uninstall entries.
-- **Portable zip:** `portable\iA-ASR_<version>_x64_portable.zip`. Unzip it anywhere and run `iA-ASR.exe`; nothing is installed. Keep the DLLs next to the exe: `onnxruntime.dll` runs the local ONNX speech models, and the `msvcp140*` / `vcruntime140*` files are the C++ runtime the app needs to start. It needs WebView2, which Windows 11 and up-to-date Windows 10 already have. Settings and meetings still go to `%APPDATA%\com.ia-asr.desktop`, as with the installed app.
+- **Portable zip:** `portable\iA-ASR_<version>_x64_portable.zip`. Unzip it anywhere and run `iA-ASR.exe`; nothing is installed. Keep the DLLs next to the exe: `onnxruntime.dll` runs the local ONNX speech models, and the `msvcp140*` / `vcruntime140*` files are the C++ runtime the app needs to start. `LICENSE.txt` (InfoAnalytica's terms) and `THIRD-PARTY-NOTICES.txt` must stay in the zip: the licenses of the software iA-ASR includes require their notices with every copy. It needs WebView2, which Windows 11 and up-to-date Windows 10 already have. Settings and meetings still go to `%APPDATA%\com.ia-asr.desktop`, as with the installed app.
 
 Test the zip on a different PC from the one you built on: a build finds `onnxruntime.dll` in `src-tauri\ort\` on the build machine even when the zip lacks it.
 

@@ -94,7 +94,9 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for setup details, debugging and 
 
 ## License
 
-Released under the [MIT License](LICENSE).
+Copyright (c) 2026 InfoAnalytica. All rights reserved. See [LICENSE](LICENSE).
+
+iA-ASR includes third-party software; its licenses and required notices are in [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt) and ship with every copy.
 
 ## Acknowledgements
 

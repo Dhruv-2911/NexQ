@@ -5,7 +5,9 @@
       "dmg"
     ],
     "resources": {
-      "ort/libonnxruntime.dylib": "libonnxruntime.dylib"
+      "ort/libonnxruntime.dylib": "libonnxruntime.dylib",
+      "../LICENSE": "LICENSE.txt",
+      "../THIRD-PARTY-NOTICES.txt": "THIRD-PARTY-NOTICES.txt"
     },
     "macOS": {
       "minimumSystemVersion": "11.0",

@@ -242,7 +242,7 @@ export function AboutSettings() {
         </div>
         <div className="rounded-xl border border-border/30 bg-card/50 p-4">
           <p className="text-meta text-muted-foreground/60">License</p>
-          <p className="mt-1 text-sm font-medium text-foreground">MIT</p>
+          <p className="mt-1 text-sm font-medium text-foreground">Proprietary</p>
         </div>
       </div>
 

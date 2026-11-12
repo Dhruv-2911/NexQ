@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Packs a Windows build into a portable zip that runs without installing:
 // the app plus the DLLs the installer normally puts next to it (ONNX Runtime
-// and the Microsoft C++ runtime, listed in tauri.windows.conf.json), and the
-// license. Run it on Windows after `npx tauri build`; `npm run package:portable`
+// and the Microsoft C++ runtime), the license and the third-party notices, as
+// listed in tauri.windows.conf.json. Run it on Windows after `npx tauri build`; `npm run package:portable`
 // does both.
 //
 // Output: portable/<product>_<version>_x64_portable.zip
@@ -37,12 +37,11 @@ copyFileSync(exe, join(outDir, `${productName}.exe`));
 for (const [from, to] of Object.entries(resources)) {
   const src = join(root, "src-tauri", from);
   if (!existsSync(src)) {
-    console.error(`Missing ${src}. Run "node scripts/fetch-onnxruntime.mjs" (npx tauri build runs it).`);
+    console.error(`Missing ${src}.${src.endsWith(".dll") ? ' Run "node scripts/fetch-onnxruntime.mjs" (npx tauri build runs it).' : ""}`);
     process.exit(1);
   }
   copyFileSync(src, join(outDir, to));
 }
-copyFileSync(join(root, "LICENSE"), join(outDir, "LICENSE.txt"));
 
 const zip = join(outRoot, `${name}.zip`);
 rmSync(zip, { force: true });
